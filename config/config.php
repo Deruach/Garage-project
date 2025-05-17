@@ -2,8 +2,8 @@
 return [
     'db' => [
         'host' => 'localhost',
-        'dbname' => 'jouw_database',
+        'dbname' => 'garage',
         'username' => 'root',// later web-user beperkte rechten!
-        'password' => 'Azelea022!'
+        'password' => 'nieuw_wachtwoord'
     ]
 ];
