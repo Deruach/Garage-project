@@ -11,25 +11,23 @@ class AuthController {
         $this->userModel = $userModel;
     }
 
-    // Login methode
     public function login($email, $password) {
         $user = $this->userModel->getUserByEmail($email);
         if ($user && password_verify($password, $user['password'])) {
-            // Start een sessie en sla gebruikersinformatie op
             session_start();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
+            $_SESSION['role'] = $user['role'];
             return true;
         }
         return false;
     }
 
-    // Register methode
-    public function register($email, $password) {
-        // Controleer of de gebruiker al bestaat
+    public function register($name, $email, $password, $role = 'customer') {
         if ($this->userModel->getUserByEmail($email)) {
-            return false; // Gebruiker bestaat al
+            return false;
         }
-        return $this->userModel->registerUser($email, $password); // Nieuwe gebruiker toevoegen
+        return $this->userModel->registerUser($name, $email, $password, $role);
     }
 }
+

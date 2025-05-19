@@ -12,7 +12,6 @@ class User {
         $this->db = $db->getConnection();
     }
 
-    // Haal gebruiker op via e-mail
     public function getUserByEmail($email) {
         $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
         $stmt = $this->db->prepare($sql);
@@ -21,13 +20,15 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Voeg nieuwe gebruiker toe
-    public function registerUser($email, $password) {
+    public function registerUser($name, $email, $password, $role = 'customer') {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (email, password) VALUES (:email, :password)";
+        $sql = "INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)";
         $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+        $stmt->bindParam(':role', $role, PDO::PARAM_STR);
         return $stmt->execute();
     }
 }
+
