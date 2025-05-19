@@ -88,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php if ($error): ?>
         <p class="mt-4 text-red-600 text-center text-sm"><?= htmlspecialchars($error) ?></p>
       <?php endif; ?>
-      
     </div>
   </div>
   
