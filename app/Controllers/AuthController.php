@@ -16,6 +16,7 @@ class AuthController {
         if ($user && password_verify($password, $user['password'])) {
             session_start();
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['name'] = $user['name'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
             return true;
