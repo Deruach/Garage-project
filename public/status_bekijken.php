@@ -11,7 +11,7 @@
   <!-- Navigatie -->
   <nav class="bg-white shadow-md py-4 px-6 flex justify-between items-center">
     <div class="text-2xl font-bold text-blue-600">GaragePro</div>
-    <a href="index.php" class="text-blue-600 hover:underline font-medium">Home</a>
+    <a href="customer_dashboard.php" class="text-blue-600 hover:underline font-medium">Home</a>
   </nav>
 
   <!-- Status sectie -->
