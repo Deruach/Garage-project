@@ -5,6 +5,25 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit;
 }
+$conn = new mysqli(
+  $config['db']['host'],
+  $config['db']['username'],
+  $config['db']['password'],
+  $config['db']['dbname']
+);
+
+if ($conn->connect_error) {
+  die("Databaseverbinding mislukt: " . $conn->connect_error);
+}
+
+// Reviews ophalen
+$reviews = [];
+$result = $conn->query("SELECT naam, score, tekst FROM reviews ORDER BY datum DESC LIMIT 10");
+
+while ($row = $result->fetch_assoc()) {
+  $reviews[] = $row;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -43,31 +62,23 @@ if (!isset($_SESSION['user_id'])) {
   <section class="max-w-4xl mx-auto px-6 py-16">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Ervaringen van andere klanten</h2>
 
-    <div class="grid gap-6 md:grid-cols-2">
-      <!-- Review 1 -->
+    <div class="grid gap-6 md:grid-cols-1">
+      <?php if (empty($reviews)): ?>
+  <p class="text-gray-500">Er zijn nog geen reviews geplaatst.</p>
+<?php else: ?>
+  <div class="grid gap-6 md:grid-cols-2">
+    <?php foreach ($reviews as $review): ?>
       <div class="bg-white p-6 rounded-lg shadow border">
-        <p class="text-gray-700 italic">"Snelle en vriendelijke service! Mijn auto was op tijd klaar."</p>
-        <div class="mt-4 text-sm text-gray-500">– Fatima B.</div>
+        <p class="text-yellow-500 text-lg mb-2">
+          <?= str_repeat("⭐", $review['score']) ?>
+        </p>
+        <p class="text-gray-700 italic">"<?= htmlspecialchars($review['tekst']) ?>"</p>
+        <div class="mt-4 text-sm text-gray-500">– <?= htmlspecialchars($review['naam'] ?? 'Anonieme klant') ?></div>
       </div>
-      
-      <!-- Review 2 -->
-      <div class="bg-white p-6 rounded-lg shadow border">
-        <p class="text-gray-700 italic">"APK en grote beurt prima uitgevoerd. Goede uitleg gekregen."</p>
-        <div class="mt-4 text-sm text-gray-500">– Kevin D.</div>
-      </div>
+    <?php endforeach; ?>
+  </div>
+<?php endif; ?>
 
-      <!-- Review 3 -->
-      <div class="bg-white p-6 rounded-lg shadow border">
-        <p class="text-gray-700 italic">"Super klantvriendelijk. Kom hier al jaren voor onderhoud."</p>
-        <div class="mt-4 text-sm text-gray-500">– Sandra V.</div>
-      </div>
-
-      <!-- Review 4 -->
-      <div class="bg-white p-6 rounded-lg shadow border">
-        <p class="text-gray-700 italic">"Eerlijke prijzen en duidelijk wat er gedaan wordt."</p>
-        <div class="mt-4 text-sm text-gray-500">– Willem P.</div>
-      </div>
-    </div>
   </section>
   <!-- Review achterlaten -->
 <section class="max-w-2xl mx-auto px-6 pt-8 pb-16">
@@ -123,6 +134,25 @@ if (!isset($_SESSION['user_id'])) {
   <footer class="text-center text-sm text-gray-500 py-6 border-t">
     &copy; 2025 GaragePro. Alle rechten voorbehouden.
   </footer>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const tekstveld = document.getElementById("tekst");
+    const maxWoorden = 30;
+    const waarschuwing = document.createElement("p");
+    waarschuwing.className = "text-sm text-gray-500 mt-1";
+    tekstveld.parentNode.appendChild(waarschuwing);
+
+    tekstveld.addEventListener("input", function () {
+      const aantalWoorden = this.value.trim().split(/\s+/).length;
+      if (aantalWoorden > maxWoorden) {
+        waarschuwing.textContent = `Maximaal ${maxWoorden} woorden toegestaan. Je hebt er nu ${aantalWoorden}.`;
+        this.value = this.value.trim().split(/\s+/).slice(0, maxWoorden).join(" ");
+      } else {
+        waarschuwing.textContent = `${aantalWoorden} / ${maxWoorden} woorden gebruikt.`;
+      }
+    });
+  });
+</script>
 
 </body>
 </html>

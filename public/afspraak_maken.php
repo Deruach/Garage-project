@@ -1,3 +1,56 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+  header("Location: login.php");
+  exit;
+}
+
+$config = require __DIR__ . '/../config/config.php';
+
+$conn = new mysqli(
+  $config['db']['host'],
+  $config['db']['username'],
+  $config['db']['password'],
+  $config['db']['dbname']
+);
+// Bezet geraakte datums ophalen uit de database
+$result = $conn->query("SELECT appointment_date FROM appointments");
+$bezetteDatums = [];
+
+while ($row = $result->fetch_assoc()) {
+  $bezetteDatums[] = $row['appointment_date'];
+}
+
+if ($conn->connect_error) {
+  die("Databaseverbinding mislukt: " . $conn->connect_error);
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Afspraken ophalen voor deze klant
+$stmt = $conn->prepare("SELECT id, appointment_date, notes, status FROM appointments WHERE customer_id = ? ORDER BY appointment_date DESC");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$afspraken = [];
+while ($row = $result->fetch_assoc()) {
+  // Extract kenteken en handeling uit notes
+  $lines = explode("\n", $row['notes']);
+  $kenteken = str_replace('Kenteken: ', '', $lines[0] ?? '');
+  $handeling = str_replace('Handeling: ', '', $lines[1] ?? '');
+  $afspraken[] = [
+    'id' => $row['id'],
+    'datum' => $row['appointment_date'],
+    'kenteken' => $kenteken,
+    'handeling' => $handeling,
+    'status' => $row['status']
+  ];
+}
+
+$stmt->close();
+?>
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -20,6 +73,15 @@
   <!-- Afspraakformulier -->
   <div class="max-w-xl mx-auto mt-12 bg-white p-8 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold text-blue-600 mb-6">Plan een afspraak</h2>
+<?php if (!empty($_SESSION['afspraak_succes'])): ?>
+  <div class="bg-green-100 text-green-700 p-3 rounded mb-4 text-sm">
+    <?= $_SESSION['afspraak_succes']; unset($_SESSION['afspraak_succes']); ?>
+  </div>
+<?php elseif (!empty($_SESSION['afspraak_fout'])): ?>
+  <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
+    <?= $_SESSION['afspraak_fout']; unset($_SESSION['afspraak_fout']); ?>
+  </div>
+<?php endif; ?>
 
     <form method="POST" action="verwerk_afspraak.php">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -78,38 +140,43 @@
       </tr>
     </thead>
     <tbody>
+  <?php if (empty($afspraken)): ?>
+    <tr>
+      <td colspan="5" class="text-center text-gray-500 py-4">Je hebt nog geen afspraken gepland.</td>
+    </tr>
+  <?php else: ?>
+    <?php foreach ($afspraken as $afspraak): ?>
       <tr>
-        <td class="px-4 py-2 border-b">2025-05-24</td>
-        <td class="px-4 py-2 border-b">XX-123-YY</td>
-        <td class="px-4 py-2 border-b">Olie verversen</td>
-        <td class="px-4 py-2 border-b text-yellow-600">In behandeling</td>
+        <td class="px-4 py-2 border-b"><?= htmlspecialchars($afspraak['datum']) ?></td>
+        <td class="px-4 py-2 border-b"><?= htmlspecialchars($afspraak['kenteken']) ?></td>
+        <td class="px-4 py-2 border-b"><?= htmlspecialchars($afspraak['handeling']) ?></td>
+        <td class="px-4 py-2 border-b <?= $afspraak['status'] === 'afgerond' ? 'text-green-600' : 'text-yellow-600' ?>">
+          <?= ucfirst($afspraak['status']) ?>
+        </td>
         <td class="px-4 py-2 border-b">
-          <a href="factuur.php?id=123" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Factuur</a>
+          <a href="factuur.php?id=<?= $afspraak['id'] ?>" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Factuur</a>
         </td>
       </tr>
-      <tr>
-        <td class="px-4 py-2 border-b">2025-05-10</td>
-        <td class="px-4 py-2 border-b">AB-987-CD</td>
-        <td class="px-4 py-2 border-b">APK keuring</td>
-        <td class="px-4 py-2 border-b text-green-600">Afgerond</td>
-        <td class="px-4 py-2 border-b">
-          <a href="factuur.php?id=124" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Factuur</a>
-        </td>
-      </tr>
-    </tbody>
+    <?php endforeach; ?>
+  <?php endif; ?>
+</tbody>
+
   </table>
 </div>
 
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-  flatpickr("#datum", {
-  inline: true,
-  dateFormat: "Y-m-d",
-  minDate: "today"
-});
+  const bezetteDatums = <?= json_encode($bezetteDatums); ?>;
 
+  flatpickr("#datum", {
+    inline: true,
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    disable: bezetteDatums
+  });
 </script>
+
 
 </body>
 </html>
