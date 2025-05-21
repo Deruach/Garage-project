@@ -72,8 +72,18 @@ if (!isset($_SESSION['user_id'])) {
   <!-- Review achterlaten -->
 <section class="max-w-2xl mx-auto px-6 pt-8 pb-16">
   <h2 class="text-xl font-bold text-gray-800 mb-4">Laat een beoordeling achter</h2>
+<?php if (!empty($_SESSION['review_success'])): ?>
+  <div class="bg-green-100 text-green-700 p-3 rounded mb-4 text-sm">
+    <?= $_SESSION['review_success']; unset($_SESSION['review_success']); ?>
+  </div>
+<?php elseif (!empty($_SESSION['review_error'])): ?>
+  <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
+    <?= $_SESSION['review_error']; unset($_SESSION['review_error']); ?>
+  </div>
+<?php endif; ?>
 
-  <form action="#" method="POST" class="bg-white p-6 rounded-lg shadow border space-y-4">
+  <form action="verwerk_review.php" method="POST" class="bg-white p-6 rounded-lg shadow border space-y-4">
+
     <!-- Naam -->
     <div>
       <label for="naam" class="block text-sm font-medium text-gray-700">Je naam (optioneel)</label>
