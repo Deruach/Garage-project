@@ -27,16 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $role = $_SESSION['role'];
             switch ($role) {
                 case 'customer':
-                    header("Location: customer_dashboard.php");
+                    header("Location: dashboards/customer_dashboard.php");
                     break;
                 case 'receptionist':
-                    header("Location: receptionist_dashboard.php");
+                    header("Location: dashboards/receptionist_dashboard.php");
                     break;
                 case 'mechanic':
-                    header("Location: monteur_dashboard.php");
+                    header("Location: dashboards/monteur_dashboard.php");
                     break;
                 case 'owner':
-                    header("Location: owner_dashboard.php");
+                    header("Location: dashboards/owner_dashboard.php");
                     break;
                 default:
                     $error = "Onbekende rol.";
