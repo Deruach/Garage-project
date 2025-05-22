@@ -34,12 +34,12 @@ $monteurs = $monteursResult->fetch_all(MYSQLI_ASSOC);
 
 // Conceptfacturen ophalen
 $facturen = $conn->query("
-  SELECT i.id, i.total_amount, i.status, i.datum, u.name AS klant
-  FROM invoices i
-  JOIN appointments a ON i.appointment_id = a.id
-  JOIN users u ON a.customer_id = u.id
-  WHERE i.status = 'concept'
-  ORDER BY i.datum DESC
+  SELECT i.id, i.total_amount, i.status, i.created_at AS datum, u.name AS klant
+FROM invoices i
+JOIN appointments a ON i.appointment_id = a.id
+JOIN users u ON a.customer_id = u.id
+WHERE i.status = 'concept'
+ORDER BY i.created_at DESC
 ");
 
 ?>
