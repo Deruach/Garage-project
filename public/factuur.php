@@ -22,7 +22,7 @@ $user_id = $_SESSION['user_id'];
 
 // ✅ Haal de factuur op (alleen als hij 'verzonden' is en van deze klant)
 $stmt = $conn->prepare("
-  SELECT i.id, i.totaalbedrag, i.status, i.datum, u.name
+  SELECT i.id, i.total_amount, i.status, i.created_at, u.name
   FROM invoices i
   JOIN appointments a ON i.appointment_id = a.id
   JOIN users u ON a.customer_id = u.id
@@ -39,7 +39,7 @@ if (!$factuur) {
 }
 
 // ✅ Haal factuurregels op
-$stmt = $conn->prepare("SELECT omschrijving, bedrag FROM invoice_lines WHERE invoice_id = ?");
+$stmt = $conn->prepare("SELECT description, amount FROM invoice_lines WHERE invoice_id = ?");
 $stmt->bind_param("i", $factuur_id);
 $stmt->execute();
 $regels = $stmt->get_result();
@@ -69,15 +69,16 @@ $regels = $stmt->get_result();
       <tbody>
         <?php while ($regel = $regels->fetch_assoc()): ?>
         <tr class="border-t">
-          <td class="px-4 py-2"><?= htmlspecialchars($regel['omschrijving']) ?></td>
-          <td class="px-4 py-2 text-right">€ <?= number_format($regel['bedrag'], 2, ',', '.') ?></td>
+          <td class="px-4 py-2"><?= htmlspecialchars($regel['description']) ?></td>
+          <td class="px-4 py-2 text-right">€ <?= number_format($regel['amount'], 2, ',', '.') ?></td>
         </tr>
         <?php endwhile; ?>
       </tbody>
       <tfoot>
         <tr class="font-bold">
           <td class="px-4 py-2 text-right">Totaal:</td>
-          <td class="px-4 py-2 text-right text-green-600">€ <?= number_format($factuur['totaalbedrag'], 2, ',', '.') ?></td>
+          <td class="px-4 py-2 text-right text-green-600">€ <?= number_format($factuur['total_amount'], 2, ',', '.') ?>
+</td>
         </tr>
       </tfoot>
     </table>

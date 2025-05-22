@@ -20,5 +20,5 @@ if ($factuur_id && in_array($actie, ['goedkeuren', 'afkeuren'])) {
   $stmt->close();
 }
 
-header("Location: receptie_dashboard.php");
+header("Location: receptionist_dashboard.php");
 exit;

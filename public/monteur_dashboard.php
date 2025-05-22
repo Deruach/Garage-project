@@ -23,12 +23,14 @@ $monteur_id = $_SESSION['user_id'];
 
 // Afspraken ophalen voor deze monteur
 $stmt = $conn->prepare("
-    SELECT a.id, a.appointment_date, a.notes, a.status, u.name AS klant_naam
-    FROM appointments a
-    JOIN users u ON a.customer_id = u.id
-    WHERE a.mechanic_id = ? AND a.status != 'completed'
-    ORDER BY a.appointment_date ASC
+  SELECT a.id, a.appointment_date, a.notes, a.status, u.name AS klant_naam
+  FROM appointments a
+  JOIN users u ON a.customer_id = u.id
+  WHERE a.mechanic_id = ? 
+    AND a.status IN ('pending', 'confirmed', 'in_progress')
+  ORDER BY a.appointment_date ASC
 ");
+
 $stmt->bind_param("i", $monteur_id);
 $stmt->execute();
 $afspraken = $stmt->get_result();
