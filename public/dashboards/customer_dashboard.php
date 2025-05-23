@@ -27,6 +27,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
   <nav class="bg-gray-900 text-white shadow-md py-4 px-6 flex justify-between items-center">
     <div class="text-2xl font-extrabold tracking-wide text-yellow-400">Luris Garage</div>
     <div class="flex items-center gap-6">
+    <a href="customer/vehicles.php" class="text-yellow-500 hover:underline font-semibold">Mijn voertuigen beheren</a>
       <a href="customer/appointment.php" class="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-400 text-sm font-semibold shadow-sm">Afspraak maken</a>
       <a href="../logout.php" class="text-sm text-yellow-400 hover:underline font-medium">Uitloggen</a>
     </div>

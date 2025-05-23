@@ -30,5 +30,10 @@ class User {
         $stmt->bindParam(':role', $role, PDO::PARAM_STR);
         return $stmt->execute();
     }
+    public function getUsersByRole(string $role): array {
+        $stmt = $this->db->prepare("SELECT id, name FROM users WHERE role = :role ORDER BY name ASC");
+        $stmt->execute(['role' => $role]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 
