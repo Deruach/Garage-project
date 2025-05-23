@@ -1,9 +1,9 @@
 <?php
 return [
     'db' => [
-        'host' => 'localhost',
+        'host' => 'db',
         'dbname' => 'garage',
-        'username' => 'root',// later web-user beperkte rechten!
-        'password' => 'nieuw_wachtwoord'
+        'username' => 'garage_user',
+        'password' => 'secret'
     ]
 ];

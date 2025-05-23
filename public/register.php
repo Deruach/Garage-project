@@ -1,5 +1,5 @@
-
 <?php
+ob_start();
 session_start();
 
 spl_autoload_register(function ($class) {
@@ -32,16 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $role = $_SESSION['role'];
                 switch ($role) {
                     case 'customer':
-                        header("Location: customer_dashboard.php");
+                        header("Location: dashboards/customer_dashboard.php");
                         break;
                     case 'receptionist':
-                        header("Location: receptionist_dashboard.php");
+                        header("Location: dashboards/receptionist_dashboard.php");
                         break;
                     case 'mechanic':
-                        header("Location: monteur_dashboard.php");
+                        header("Location: dashboards/monteur_dashboard.php");
                         break;
                     case 'owner':
-                        header("Location: owner_dashboard.php");
+                        header("Location: dashboards/owner_dashboard.php");
                         break;
                     default:
                         $error = "Onbekende rol.";
@@ -88,9 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php if ($error): ?>
         <p class="mt-4 text-red-600 text-center text-sm"><?= htmlspecialchars($error) ?></p>
       <?php endif; ?>
-      <?php if ($success): ?>
-        <p class="mt-4 text-green-600 text-center text-sm"><?= htmlspecialchars($success) ?></p>
-      <?php endif; ?>
+
+      <p class="text-sm text-center mt-4 text-gray-600">
+        All een account? <a href="login.php" class="text-blue-600 hover:underline">Login hier</a>.
+      </p>
     </div>
   </div>
   
