@@ -76,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (!empty($error)): ?>
           <p class="text-red-600 text-sm mt-4 text-center"><?= htmlspecialchars($error) ?></p>
         <?php endif; ?>
-
       </form>
 
       <p class="text-sm text-center mt-4 text-gray-600">

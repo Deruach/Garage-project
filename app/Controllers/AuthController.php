@@ -14,7 +14,6 @@ class AuthController {
     public function login($email, $password) {
         $user = $this->userModel->getUserByEmail($email);
         if ($user && password_verify($password, $user['password'])) {
-            session_start();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = $user['role'];
