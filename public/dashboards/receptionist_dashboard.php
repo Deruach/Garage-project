@@ -31,10 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mechanicId = $_POST['mechanic_id'] ?? null;
 
         // Als de waarde een lege string is, zet dan op null
-        if ($mechanicId === '') {
+        if ($mechanicId === '' || $mechanicId === null) {
             $mechanicId = null;
         } else {
-            $mechanicId = (int)$mechanicId;  // cast naar int
+            $mechanicId = (int)$mechanicId;
+
+            // extra beveiliging: check of $mechanicId > 0
+            if ($mechanicId <= 0) {
+                $mechanicId = null;
+            }
         }
 
         if ($mechanicId !== null) {
@@ -58,7 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Ophalen van afspraken voor vandaag (of voor een specifieke dag)
 $selectedDate = $_GET['date'] ?? date('Y-m-d');
-$appointments = $appointmentModel->getByDate($selectedDate);
+$selectedStatus = $_GET['status'] ?? null;
+$appointments = $appointmentModel->getByDateAndStatus($selectedDate, $selectedStatus);
+
 
 // Alle monteurs ophalen om toe te wijzen
 $mechanics = $userModel->getUsersByRole('mechanic');
@@ -85,11 +92,30 @@ $mechanics = $userModel->getUsersByRole('mechanic');
   <div class="mb-4 p-3 bg-green-200 text-green-800 rounded"><?= htmlspecialchars($message) ?></div>
 <?php endif; ?>
 
-<form method="GET" class="mb-6">
-  <label for="date" class="mr-2 font-semibold">Kies datum:</label>
-  <input type="date" id="date" name="date" value="<?= htmlspecialchars($selectedDate) ?>" required>
-  <button type="submit" class="ml-2 bg-yellow-400 px-4 py-1 rounded font-semibold hover:bg-yellow-500">Filter</button>
+<?php
+$selectedStatus = $_GET['status'] ?? '';
+?>
+<form method="GET" class="mb-6 flex gap-4 items-center">
+  <div>
+    <label for="date" class="font-semibold">Kies datum:</label>
+    <input type="date" id="date" name="date" value="<?= htmlspecialchars($selectedDate) ?>" required>
+  </div>
+
+  <div>
+    <label for="status" class="font-semibold">Status:</label>
+    <select name="status" id="status" class="border rounded px-2 py-1">
+      <option value="">-- Alle statussen --</option>
+      <?php foreach (['pending', 'confirmed', 'in_progress', 'ready', 'completed'] as $statusOption): ?>
+        <option value="<?= $statusOption ?>" <?= $selectedStatus === $statusOption ? 'selected' : '' ?>>
+          <?= ucfirst(str_replace('_', ' ', $statusOption)) ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+  </div>
+
+  <button type="submit" class="bg-yellow-400 px-4 py-1 rounded font-semibold hover:bg-yellow-500">Filter</button>
 </form>
+
 
 <table class="min-w-full bg-white rounded shadow">
   <thead>

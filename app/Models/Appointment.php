@@ -75,13 +75,18 @@ class Appointment {
 
     // Haal alle afspraken van een klant op
     public function getByCustomerId(int $customerId): array {
-        $sql = "SELECT a.*, v.license_plate, rt.description AS handeling
-                FROM appointments a
-                JOIN vehicles v ON a.vehicle_id = v.id
-                LEFT JOIN repairs r ON r.appointment_id = a.id
-                LEFT JOIN repair_types rt ON r.repair_type_id = rt.id
-                WHERE a.customer_id = :customer_id
-                ORDER BY a.appointment_date DESC";
+        $sql = "
+            SELECT a.*, 
+                v.license_plate, 
+                rt.description AS handeling
+            FROM appointments a
+            JOIN vehicles v ON a.vehicle_id = v.id
+            LEFT JOIN repairs r ON a.id = r.appointment_id
+            LEFT JOIN repair_types rt ON r.repair_type_id = rt.id
+            WHERE a.appointment_date = :date
+            AND (:status IS NULL OR a.status = :status)
+            ORDER BY a.appointment_date DESC
+        ";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':customer_id', $customerId, PDO::PARAM_INT);
         $stmt->execute();
@@ -105,18 +110,32 @@ class Appointment {
 
 
     // Haal afspraken op datum
-    public function getByDate(string $date): array {
-        $stmt = $this->db->prepare("
+    public function getByDateAndStatus(string $date, ?string $status = null): array
+    {
+        $baseSql = "
             SELECT a.*, v.license_plate, rt.description AS handeling, u.name AS mechanic_name
             FROM appointments a
             JOIN vehicles v ON a.vehicle_id = v.id
-            LEFT JOIN repairs r ON r.appointment_id = a.id
-            LEFT JOIN repair_types rt ON r.repair_type_id = rt.id
+            LEFT JOIN repairs rep ON rep.appointment_id = a.id
+            LEFT JOIN repair_types rt ON rt.id = rep.repair_type_id
             LEFT JOIN users u ON a.mechanic_id = u.id
             WHERE a.appointment_date = :date
-            ORDER BY a.appointment_date ASC
-        ");
-        $stmt->execute(['date' => $date]);
+        ";
+
+        if ($status) {
+            $baseSql .= " AND a.status = :status";
+        }
+
+        $baseSql .= " ORDER BY a.appointment_date DESC";
+
+        $stmt = $this->db->prepare($baseSql);
+
+        if ($status) {
+            $stmt->execute(['date' => $date, 'status' => $status]);
+        } else {
+            $stmt->execute(['date' => $date]);
+        }
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
