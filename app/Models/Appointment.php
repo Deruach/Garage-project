@@ -83,15 +83,14 @@ class Appointment {
             JOIN vehicles v ON a.vehicle_id = v.id
             LEFT JOIN repairs r ON a.id = r.appointment_id
             LEFT JOIN repair_types rt ON r.repair_type_id = rt.id
-            WHERE a.appointment_date = :date
-            AND (:status IS NULL OR a.status = :status)
+            WHERE a.customer_id = :customer_id
             ORDER BY a.appointment_date DESC
         ";
         $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':customer_id', $customerId, PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt->execute(['customer_id' => $customerId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Haal alle data van afspraken (voor flatpickr, etc.)
       public function getAllAppointmentDates(): array {
