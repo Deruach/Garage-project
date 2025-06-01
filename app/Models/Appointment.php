@@ -91,7 +91,6 @@ class Appointment {
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
-
     // Haal alle data van afspraken (voor flatpickr, etc.)
       public function getAllAppointmentDates(): array {
           // Haal data op waar 4 afspraken staan, blokkeer deze dagen
