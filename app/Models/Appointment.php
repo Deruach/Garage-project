@@ -72,6 +72,23 @@ class Appointment {
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
+    public function getByMechanicAndDate(int $mechanicId, string $date): array {
+    $sql = "
+        SELECT a.*, u.name AS customer_name
+        FROM appointments a
+        JOIN users u ON a.customer_id = u.id
+        WHERE a.mechanic_id = :mechanic_id
+          AND a.appointment_date = :date
+        ORDER BY a.appointment_date DESC
+    ";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([
+        ':mechanic_id' => $mechanicId,
+        ':date' => $date
+    ]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 
     // Haal alle afspraken van een klant op
         public function getByCustomerId(int $customerId): array {

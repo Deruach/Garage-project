@@ -32,7 +32,14 @@ class Vehicle {
 
         return $stmt->execute();
     }
+public function getById(int $id): ?array {
+        $sql = "SELECT * FROM vehicles WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        return $result ?: null;
+    }
     public function getVehiclesByCustomerId($customerId) {
         $sql = "SELECT * FROM vehicles WHERE customer_id = :customer_id";
         $stmt = $this->db->prepare($sql);
