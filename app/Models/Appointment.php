@@ -74,23 +74,22 @@ class Appointment {
     }
 
     // Haal alle afspraken van een klant op
-    public function getByCustomerId(int $customerId): array {
-        $sql = "
-            SELECT a.*, 
-                v.license_plate, 
-                rt.description AS handeling
-            FROM appointments a
-            JOIN vehicles v ON a.vehicle_id = v.id
-            LEFT JOIN repairs r ON a.id = r.appointment_id
-            LEFT JOIN repair_types rt ON r.repair_type_id = rt.id
-            WHERE a.customer_id = :customer_id
-            ORDER BY a.appointment_date DESC
-        ";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['customer_id' => $customerId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
+        public function getByCustomerId(int $customerId): array {
+            $sql = "
+                SELECT a.*, 
+                    v.license_plate, 
+                    rt.description AS handeling
+                FROM appointments a
+                JOIN vehicles v ON a.vehicle_id = v.id
+                LEFT JOIN repairs r ON a.id = r.appointment_id
+                LEFT JOIN repair_types rt ON r.repair_type_id = rt.id
+                WHERE a.customer_id = :customer_id
+                ORDER BY a.appointment_date DESC
+            ";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['customer_id' => $customerId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
 
     // Haal alle data van afspraken (voor flatpickr, etc.)
       public function getAllAppointmentDates(): array {
