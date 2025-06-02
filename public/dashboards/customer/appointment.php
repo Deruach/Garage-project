@@ -172,7 +172,8 @@ $repairTypes = $repairTypeModel->getAll();
                 <tr class="hover:bg-yellow-50 transition">
                   <td class="px-6 py-4 border-b"><?= htmlspecialchars($afspraak['appointment_date']) ?></td>
                   <td class="px-6 py-4 border-b uppercase"><?= htmlspecialchars($afspraak['license_plate']) ?></td>
-                  <td class="px-6 py-4 border-b"><?= htmlspecialchars($afspraak['handeling']) ?></td>
+                  <td class="px-6 py-4 border-b"><?= htmlspecialchars($afspraak['handeling'] ?? '') ?></td>
+
                   <td class="px-6 py-4 border-b"><?= htmlspecialchars($afspraak['status']) ?></td>
                   <td class="px-6 py-4 border-b text-gray-500">-</td>
                 </tr>
